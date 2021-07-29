@@ -31,20 +31,20 @@ const routes = [
     beforeEnter: (to) => {
       // <--- put API call here
       return EventService.getEvent(to.params.id) // Return and params.id
-      .then((response) => {
-        //Still need to set the data here
-        GStore.event = response.data // <--- Store the event
-      })
-      .catch((error) => {
-        if (error.response && error.response.status == 404) {
-          return {
-            name: '404Resource',
-            params: { resource: 'event' }
+        .then((response) => {
+          //Still need to set the data here
+          GStore.event = response.data // <--- Store the event
+        })
+        .catch((error) => {
+          if (error.response && error.response.status == 404) {
+            return {
+              name: '404Resource',
+              params: { resource: 'event' }
+            }
+          } else {
+            return { name: 'NetworkError' }
           }
-        } else {
-          return { name: 'NetworkError' }
-        }
-      })
+        })
     },
     children: [
       {
@@ -76,7 +76,7 @@ const routes = [
     path: '/:catchAll(.*)',
     name: 'NotFound',
     component: NotFound
-  },{
+  }, {
     path: '/network-error',
     name: 'NetworkError',
     component: NetWorkError
@@ -85,7 +85,14 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
 })
 router.beforeEach(() => {
   NProgress.start()
